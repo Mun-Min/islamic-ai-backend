@@ -44,9 +44,9 @@ async def ask(data: Question):
         f"Here is an answer from IslamQA:\n{scraped}\n\n"
         f"Please do two things:\n"
         f"1. Summarize the key points from the IslamQA answer.\n"
-        f"2. Then provide a well-rounded response in your own words, based on authentic Islamic sources "
+        f"\n2. Then provide a well-rounded response in your own words, based on authentic Islamic sources "
         f"and your understanding as a knowledgeable assistant.\n"
-        f"Make sure the final response is clear and respectful."
+        f"Make sure the final response is clear and respectful. Use line breaks and numbered or bulleted lists where helpful to make the answer easy to read."
     )
 
     response = client.chat.completions.create(
