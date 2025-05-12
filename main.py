@@ -43,11 +43,13 @@ async def ask(data: Question):
         f"A Muslim user asked: '{query}'.\n\n"
         f"Here is an answer from IslamQA:\n{scraped}\n\n"
         f"Please do two things:\n"
-        f"1. Summarize the key points from the IslamQA answer.\n"
-        f"\n2. Then provide a well-rounded response in your own words, based on authentic Islamic sources "
-        f"and your understanding as a knowledgeable assistant.\n"
-        f"Make sure the final response is clear and respectful. Use line breaks and numbered or bulleted lists where helpful to make the answer easy to read."
+        f"1. **Summarize the key points from the IslamQA answer** (if available) using bullet points and line breaks.\n"
+        f"2. **Provide a clear, concise, and respectful Islamic answer** in your own words, based on Qur'an, Hadith, and scholarly consensus.\n"
+        f"- Format the final answer clearly with bold text for titles or important terms.\n"
+        f"- Use emojis sparingly to make sections visually engaging, e.g., 📿 for prayer, 📖 for Quran, 🙏 for supplication.\n"
+        f"- Make the content well-spaced and easy to read."
     )
+
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
