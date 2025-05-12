@@ -1,6 +1,6 @@
 fastapi
-uvicorn
-openai
+uvicorn[standard]
+openai>=1.0.0
 beautifulsoup4
 requests
 python-dotenv

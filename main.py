@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import openai
+from openai import OpenAI
 import requests
 from bs4 import BeautifulSoup
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,11 +8,12 @@ import os
 
 app = FastAPI()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize OpenAI client (uses OPENAI_API_KEY from env)
+client = OpenAI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Use Netlify domain in production
+    allow_origins=["*"],  # In production, specify Netlify domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,7 +32,7 @@ def scrape_islamqa(query: str) -> str:
     top_link = "https://islamqa.info" + links[0]['href']
     article = requests.get(top_link)
     content = BeautifulSoup(article.text, "html.parser").select("div.answercontent p")
-    return "\n".join(p.text for p in content[:4])  # Get 4 paragraphs
+    return "\n".join(p.text for p in content[:4])  # First 4 paragraphs
 
 @app.post("/ask")
 async def ask(data: Question):
@@ -48,7 +49,7 @@ async def ask(data: Question):
         f"Make sure the final response is clear and respectful."
     )
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful Islamic assistant. Your advice should be based on Qur'an, Hadith, and scholarly consensus."},
@@ -56,5 +57,4 @@ async def ask(data: Question):
         ]
     )
 
-    return {"answer": response["choices"][0]["message"]["content"]}
-
+    return {"answer": response.choices[0].message.content}
