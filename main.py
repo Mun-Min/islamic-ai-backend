@@ -50,7 +50,7 @@ async def ask(data: Question):
     )
 
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful Islamic assistant. Your advice should be based on Qur'an, Hadith, and scholarly consensus."},
             {"role": "user", "content": prompt}
