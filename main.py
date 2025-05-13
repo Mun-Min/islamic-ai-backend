@@ -13,7 +13,7 @@ client = OpenAI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify Netlify domain
+    allow_origins=["https://islamicai.netlify.app/"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
