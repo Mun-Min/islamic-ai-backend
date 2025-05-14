@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
+from typing import List, Literal
 import requests
 from bs4 import BeautifulSoup
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,30 +20,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Question(BaseModel):
-    question: str
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
 
+class ChatRequest(BaseModel):
+    messages: List[ChatMessage]
 
 @app.post("/ask")
-async def ask(data: Question):
-    query = data.question
+async def ask(data: ChatRequest):
+    # Add a system instruction at the start of the message list
+    system_message = {
+        "role": "system",
+        "content": (
+            "You are a helpful Islamic assistant. Answer questions based only on the Qur'an, Hadith, and scholarly consensus. "
+            "Only respond to Islamic-related questions. Politely decline or redirect if the question is unrelated to Islam. "
+            "Format answers clearly with bold titles where appropriate, use sparse emojis like 📿 or 📖, and ensure clarity and Islamic decorum."
+            "Make the content well-spaced and easy to read, clear and concise."
+        )
+    }
 
-    prompt = (
-        f"A Muslim user asked: '{query}'.\n\n"
-        f"Please do these things:\n"
-        f"**Provide a clear, concise, and respectful Islamic answer** in your own words, based on Qur'an, Hadith, and scholarly consensus.\n"
-        f"- Format the final answer clearly with bold text for titles or important terms.\n"
-        f"- Use emojis sparingly to make sections visually engaging, e.g., 📿 for prayer, 📖 for Quran, 🙏 for supplication.\n"
-        f"- Make the content well-spaced and easy to read."
-    )
+   # Combine system message with user chat history
+    full_messages = [system_message] + [msg.model_dump() for msg in data.messages]
 
-
+    # Send to OpenAI
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful Islamic assistant. Your advice should be based on Qur'an, Hadith, and scholarly consensus."},
-            {"role": "user", "content": prompt}
-        ]
+        messages=full_messages
     )
 
-    return {"answer": response.choices[0].message.content}
+    return {"answer": response.choices[0].message.content.strip()}
